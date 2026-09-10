@@ -545,7 +545,7 @@
   }
 
   function contactRow(kind, inner, s, forEmail, nowrap, last){
-    var pb = last ? '' : 'padding-bottom:9px;';
+    var pb = last ? '' : 'padding-bottom:6px;';
     return '<tr>'
       + '<td style="width:26px; vertical-align:middle;'+pb+'">'+img(kind, s, forEmail)+'</td>'
       + '<td style="padding-left:10px; font-size:13px; color:#2263cf; vertical-align:middle;'+pb+(nowrap?' white-space:nowrap;':'')+'">'+inner+'</td>'
@@ -574,21 +574,21 @@
     // ----- name block -----
     var nameBlock = "";
     if(s.include.title && f.title){
-      nameBlock += '<div style="font-size:13px; font-weight:600; color:#2263cf; margin:0 0 3px;">'+esc(f.title)+'</div>';
+      nameBlock += '<div style="font-size:13px; font-weight:600; color:#2263cf; margin:0 0 1px;">'+esc(f.title)+'</div>';
     }
     var nameParts = [];
     if(s.include.nameZh && f.nameZh) nameParts.push(esc(f.nameZh));
     if(s.include.nameEn && f.nameEn) nameParts.push(esc(f.nameEn));
     if(nameParts.length){
-      nameBlock += '<div style="font-size:20px; font-weight:800; color:#2263cf; line-height:1.3; margin:0 0 16px;">'+nameParts.join(" ")+'</div>';
+      nameBlock += '<div style="font-size:19px; font-weight:800; color:#2263cf; line-height:1.2; margin:0 0 11px;">'+nameParts.join(" ")+'</div>';
     }
 
     // ----- footer -----
     var footer = "";
     if(s.include.footer){
       footer =
-        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;"><tr>'
-        + '<td style="border-top:1px solid #c5d2e8; padding-top:13px; font-size:12px; font-weight:700; line-height:1.6;">'
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:11px;"><tr>'
+        + '<td style="border-top:1px solid #c5d2e8; padding-top:9px; font-size:12px; font-weight:700; line-height:1.45;">'
         + '<a href="https://www.yourator.co" style="color:#2263cf; text-decoration:none;">Yourator 官網</a>'
         + '<span style="color:#2263cf;">｜</span>'
         + '<a href="https://teamdoor.io" style="color:#2263cf; text-decoration:none;">Teamdoor 官網</a>'
@@ -597,13 +597,13 @@
     }
 
     // ----- logo (top) -----
-    var logoBlock = '<div style="margin:0 0 16px;">'+img("logo", s, forEmail, 160)+'</div>';
+    var logoBlock = '<div style="margin:0 0 10px;">'+img("logo", s, forEmail, 150)+'</div>';
 
     // ----- outer (single column, compact width) -----
     return ''
       + '<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
       + 'style="width:100%; max-width:460px; background-color:#eef4fc; background:radial-gradient(120% 150% at 92% 0%, #e6eefa 0%, #eef4fc 50%, #f7faff 82%); border-radius:16px; border-collapse:separate; font-family:\'Noto Sans TC\',\'Microsoft JhengHei\',\'PingFang TC\',\'Segoe UI\',Arial,sans-serif;">'
-      + '<tr><td style="padding:24px 26px 22px;">'
+      + '<tr><td style="padding:18px 22px 16px;">'
       + logoBlock + nameBlock + contactTable + footer
       + '</td></tr></table>';
   }
