@@ -104,7 +104,7 @@
   header.top{position:relative;}
 
   .grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.08fr); gap:26px; align-items:start;}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+  @media (max-width:900px){ .grid{grid-template-columns:minmax(0,1fr);} }
 
   .panel{
     background:var(--surface); border:1px solid var(--border);
@@ -218,6 +218,28 @@
   .size-bar .presets button.on{background:var(--brand); color:#fff; border-color:var(--brand);}
   .size-bar .readout{margin-left:auto; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums;}
   .size-bar .readout b{color:var(--brand);}
+
+  /* Dark-mode simulation bar */
+  .dm-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 10px; font-size:12px; color:var(--muted);}
+  .dm-bar .dm-btns{display:flex; gap:6px; flex-wrap:wrap;}
+  .dm-bar .dm-btns button{
+    font-family:inherit; font-size:12px; color:var(--ink);
+    background:var(--surface); border:1px solid var(--border); border-radius:7px;
+    padding:4px 9px; cursor:pointer;
+  }
+  .dm-bar .dm-btns button:hover{border-color:var(--brand); color:var(--brand);}
+  .dm-bar .dm-btns button.on{background:var(--brand); color:#fff; border-color:var(--brand);}
+
+  /* Applied to .canvas to simulate each client's dark-mode behavior */
+  .canvas[data-dm="dark"], .canvas[data-dm="smart"], .canvas[data-dm="harsh"]{background:#121212;}
+  .canvas[data-dm="partial"]{background:#191919;}
+  .canvas[data-dm="smart"] #preview{filter:invert(1) hue-rotate(180deg);}
+  .canvas[data-dm="harsh"] #preview{filter:invert(1);}
+  .canvas[data-dm="partial"] #preview table{background:#2b2f36 !important; background-color:#2b2f36 !important;}
+  .canvas[data-dm="dark"] .sig-frame,
+  .canvas[data-dm="smart"] .sig-frame,
+  .canvas[data-dm="harsh"] .sig-frame,
+  .canvas[data-dm="partial"] .sig-frame{border-color:#555; background:rgba(255,255,255,.05);}
 
   .actions{display:flex; flex-wrap:wrap; gap:10px;}
   button.act{
@@ -410,8 +432,18 @@
           </div>
           <span class="readout">寬度 <b id="sizeReadout">600</b> px</span>
         </div>
-        <div class="canvas"><div class="sig-frame" id="sigFrame"><div id="preview"></div></div></div>
-        <p class="cap" style="margin:8px 0 0; color:var(--muted); font-size:12px;">拖曳虛線框右下角可自由調整寬度，模擬不同信箱／裝置上的實際顯示尺寸；拖到 480px 以下會切換成手機直式版。</p>
+        <div class="dm-bar">
+          <span>深色模式</span>
+          <div class="dm-btns">
+            <button type="button" data-dm="light" title="Apple Mail 淺色 / Gmail 桌面 / Yahoo">淺色</button>
+            <button type="button" data-dm="dark" title="Apple Mail 深色 / Gmail 桌面深色：不反轉，淺色卡片浮在深底">深色·不反轉</button>
+            <button type="button" data-dm="smart" title="Gmail iOS App / Apple 系深色：智慧反轉，保留藍色">智慧反轉</button>
+            <button type="button" data-dm="harsh" title="部分舊版 Outlook Windows：粗暴反轉，藍→金">粗暴反轉</button>
+            <button type="button" data-dm="partial" title="Outlook Android / 網頁版：只壓深背景、藍字不變（對比風險）">部分反轉</button>
+          </div>
+        </div>
+        <div class="canvas" id="canvas" data-dm="light"><div class="sig-frame" id="sigFrame"><div id="preview"></div></div></div>
+        <p class="cap" style="margin:8px 0 0; color:var(--muted); font-size:12px;">拖曳虛線框右下角可調整寬度，模擬不同裝置尺寸（480px 以下切手機直式）。上方「深色模式」可預覽各家信箱的深色行為 —— 為近似模擬，實際仍以真機測試為準。</p>
       </div>
 
       <div class="actions">
@@ -747,6 +779,22 @@
       window.addEventListener("mousemove", report);
     }
     report();
+  })();
+
+  /* ---------- Dark-mode preview switch ---------- */
+  (function(){
+    var canvas=document.getElementById("canvas");
+    var btns=document.querySelectorAll(".dm-btns button");
+    if(!canvas) return;
+    var DM="yourator-sig-dm";
+    function setMode(m){
+      canvas.setAttribute("data-dm", m);
+      btns.forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-dm")===m); });
+      try{ localStorage.setItem(DM, m); }catch(e){}
+    }
+    btns.forEach(function(b){ b.addEventListener("click", function(){ setMode(b.getAttribute("data-dm")); }); });
+    var saved="light"; try{ var s=localStorage.getItem(DM); if(s) saved=s; }catch(e){}
+    setMode(saved);
   })();
 
   refresh();
