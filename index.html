@@ -241,7 +241,7 @@
           <input class="chk" type="checkbox" data-include checked aria-label="顯示中文姓名">
           <div class="body">
             <label class="name">中文姓名</label>
-            <input type="text" data-field="nameZh" placeholder="例：詹錚瑄">
+            <input type="text" data-field="nameZh" placeholder="例：王小明">
           </div>
         </div>
 
@@ -249,7 +249,7 @@
           <input class="chk" type="checkbox" data-include checked aria-label="顯示英文姓名">
           <div class="body">
             <label class="name">英文姓名</label>
-            <input type="text" data-field="nameEn" placeholder="例：JennyJen">
+            <input type="text" data-field="nameEn" placeholder="例：Ming Wang">
           </div>
         </div>
 
@@ -269,7 +269,7 @@
           <input class="chk" type="checkbox" data-include checked aria-label="顯示電話">
           <div class="body">
             <label class="name">電話</label>
-            <input type="text" data-field="phone" placeholder="例：02-7755-0586">
+            <input type="text" data-field="phone" placeholder="例：02-1234-5678">
           </div>
         </div>
 
@@ -277,7 +277,7 @@
           <input class="chk" type="checkbox" data-include checked aria-label="顯示手機">
           <div class="body">
             <label class="name">手機</label>
-            <input type="text" data-field="mobile" placeholder="例：0972-253-973">
+            <input type="text" data-field="mobile" placeholder="例：0912-345-678">
           </div>
         </div>
 
@@ -293,7 +293,7 @@
           <input class="chk" type="checkbox" data-include checked aria-label="顯示 LINE ID">
           <div class="body">
             <label class="name">LINE ID</label>
-            <input type="text" data-field="line" placeholder="例：jenny50215">
+            <input type="text" data-field="line" placeholder="例：your-line-id">
           </div>
         </div>
 
@@ -302,7 +302,7 @@
           <div class="body">
             <label class="name">LinkedIn <span class="hint">（顯示文字＋個人頁網址）</span></label>
             <div class="inputs two-inline">
-              <input type="text" data-field="linkedinText" placeholder="顯示文字，例：JennyJen">
+              <input type="text" data-field="linkedinText" placeholder="顯示文字，例：Ming Wang">
               <input type="url" data-field="linkedinUrl" placeholder="https://www.linkedin.com/in/…">
             </div>
           </div>
@@ -409,13 +409,13 @@
   function dataURI(kind){ return "data:image/svg+xml;utf8," + encodeURIComponent(SVG[kind]); }
   function iconData(kind){ return PNG_ICONS[kind] || dataURI(kind); }
 
-  /* ---------- Defaults (example = JennyJen) ---------- */
+  /* ---------- Defaults (example = Ming Wang) ---------- */
   var DEFAULTS = {
     fields:{
-      nameZh:"詹錚瑄", nameEn:"JennyJen", title:"Graphic Designer",
-      phone:"02-7755-0586", mobile:"0972-253-973",
-      email:"jennyjen0923@gmail.com", line:"jenny50215",
-      linkedinText:"JennyJen", linkedinUrl:"https://www.linkedin.com/in/你的帳號",
+      nameZh:"王小明", nameEn:"Ming Wang", title:"Graphic Designer",
+      phone:"02-1234-5678", mobile:"0912-345-678",
+      email:"name@yourator.co", line:"your-line-id",
+      linkedinText:"Ming Wang", linkedinUrl:"https://www.linkedin.com/in/你的帳號",
       bookingUrl:"https://你的預約連結"
     },
     include:{ nameZh:true, nameEn:true, title:true, phone:true, mobile:true, email:true, line:true, linkedin:true, booking:true, footer:true },
