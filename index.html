@@ -10,14 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
 <style>
-  /* ---------- Email signature RWD (only affects .yr-* in the preview) ---------- */
-  @media only screen and (max-width:480px){
-    .yr-logo{display:block !important; width:100% !important; text-align:center !important; padding:0 0 18px 0 !important;}
-    .yr-main{display:block !important; width:100% !important; text-align:center !important;}
-    .yr-col{display:block !important; width:100% !important;}
-    .yr-col-r{padding-top:11px !important;}
-  }
-
   /* ---------- Tool theme tokens ---------- */
   :root{
     --bg:#eef2f9;
@@ -184,9 +176,8 @@
   }
   /* Resizable frame = simulated email width. Drag the right edge. */
   .sig-frame{
-    width:600px; min-width:280px; max-width:760px;
+    width:480px; min-width:280px; max-width:760px;
     resize:horizontal; overflow:auto;
-    container-type:inline-size;
     border:1px dashed var(--border-strong); border-radius:12px;
     background:rgba(255,255,255,.35);
     padding:6px; box-sizing:content-box;
@@ -194,15 +185,6 @@
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .sig-frame{background:rgba(255,255,255,.06);} }
   :root[data-theme="dark"] .sig-frame{background:rgba(255,255,255,.06);}
   .sig-frame::-webkit-resizer{ background:var(--brand-soft); }
-
-  /* Container-query mirror of the email's max-width:480px stack rule,
-     so dragging the frame narrow shows the real mobile layout. */
-  @container (max-width:480px){
-    .yr-logo{display:block !important; width:100% !important; text-align:center !important; padding:0 0 18px 0 !important;}
-    .yr-main{display:block !important; width:100% !important; text-align:center !important;}
-    .yr-col{display:block !important; width:100% !important;}
-    .yr-col-r{padding-top:11px !important;}
-  }
 
   .size-bar{
     display:flex; align-items:center; gap:10px; flex-wrap:wrap;
@@ -425,12 +407,12 @@
         <div class="size-bar">
           <span>模擬信箱寬度</span>
           <div class="presets">
-            <button type="button" data-w="360">360</button>
+            <button type="button" data-w="320">320</button>
+            <button type="button" data-w="375">375</button>
             <button type="button" data-w="480">480</button>
             <button type="button" data-w="600">600</button>
-            <button type="button" data-w="640">640</button>
           </div>
-          <span class="readout">寬度 <b id="sizeReadout">600</b> px</span>
+          <span class="readout">寬度 <b id="sizeReadout">480</b> px</span>
         </div>
         <div class="dm-bar">
           <span>深色模式</span>
@@ -443,7 +425,7 @@
           </div>
         </div>
         <div class="canvas" id="canvas" data-dm="light"><div class="sig-frame" id="sigFrame"><div id="preview"></div></div></div>
-        <p class="cap" style="margin:8px 0 0; color:var(--muted); font-size:12px;">拖曳虛線框右下角可調整寬度，模擬不同裝置尺寸（480px 以下切手機直式）。上方「深色模式」可預覽各家信箱的深色行為 —— 為近似模擬，實際仍以真機測試為準。</p>
+        <p class="cap" style="margin:8px 0 0; color:var(--muted); font-size:12px;">拖曳虛線框右下角可調整寬度，模擬手機到桌面的顯示（單欄版面在任何寬度都不會斷行）。上方「深色模式」可預覽各家信箱的深色行為 —— 為近似模擬，實際仍以真機測試為準。</p>
       </div>
 
       <div class="actions">
@@ -562,20 +544,21 @@
     return '<img src="'+iconSrc(kind,s,forEmail)+'" width="'+w+'" height="'+(kind==="logo"?"":w)+'" style="display:block;'+(kind==="logo"?"":" width:"+w+"px; height:"+w+"px;")+'" alt="'+esc(ALT[kind])+'">';
   }
 
-  function contactCell(kind, inner){
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" class="yr-item"><tr>'
-      + '<td style="width:26px; vertical-align:middle;">%ICON%</td>'
-      + '<td style="padding-left:10px; font-size:13px; color:#2263cf; vertical-align:middle;">'+inner+'</td>'
-      + '</tr></table>';
+  function contactRow(kind, inner, s, forEmail, nowrap, last){
+    var pb = last ? '' : 'padding-bottom:9px;';
+    return '<tr>'
+      + '<td style="width:26px; vertical-align:middle;'+pb+'">'+img(kind, s, forEmail)+'</td>'
+      + '<td style="padding-left:10px; font-size:13px; color:#2263cf; vertical-align:middle;'+pb+(nowrap?' white-space:nowrap;':'')+'">'+inner+'</td>'
+      + '</tr>';
   }
 
   function buildSignature(s, forEmail){
-    // ----- contact items in fixed order -----
+    // ----- single-column contact list (robust everywhere: no media query needed) -----
     var items = [];
-    function add(kind, ok, inner){ if(ok) items.push({kind:kind, inner:inner}); }
+    function add(kind, ok, inner, nowrap){ if(ok) items.push({kind:kind, inner:inner, nowrap:!!nowrap}); }
     var f = s.fields;
-    add("phone",  s.include.phone  && f.phone,  esc(f.phone));
-    add("mobile", s.include.mobile && f.mobile, esc(f.mobile));
+    add("phone",  s.include.phone  && f.phone,  esc(f.phone), true);
+    add("mobile", s.include.mobile && f.mobile, esc(f.mobile), true);
     add("email",  s.include.email  && f.email,  '<a href="mailto:'+esc(f.email)+'" style="color:#2263cf; text-decoration:none;">'+esc(f.email)+'</a>');
     add("line",   s.include.line   && f.line,   esc(f.line));
     add("linkedin", s.include.linkedin && (f.linkedinText||f.linkedinUrl),
@@ -583,44 +566,29 @@
     add("booking", s.include.booking && f.bookingUrl,
         '<a href="'+esc(f.bookingUrl)+'" style="color:#2263cf; text-decoration:none;">預約會議</a>');
 
-    var n = items.length;
-    var leftN = Math.ceil(n/2);
-    var cols = [items.slice(0,leftN), items.slice(leftN)];
-
-    function renderCol(arr){
-      return arr.map(function(it, i){
-        var cell = contactCell(it.kind, it.inner).replace("%ICON%", img(it.kind, s, forEmail));
-        var mb = (i < arr.length-1) ? ' style="margin-bottom:11px;"' : '';
-        // apply margin by wrapping table's style: rebuild with margin
-        if(mb){ cell = cell.replace('class="yr-item">', 'class="yr-item"'+mb+'>'); }
-        return cell;
-      }).join("");
-    }
-
     var contactTable =
-      '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
-      + '<td class="yr-col" valign="top" style="width:52%; padding-right:10px;">'+renderCol(cols[0])+'</td>'
-      + '<td class="yr-col yr-col-r" valign="top" style="width:48%;">'+renderCol(cols[1])+'</td>'
-      + '</tr></table>';
+      '<table role="presentation" cellpadding="0" cellspacing="0" border="0">'
+      + items.map(function(it, i){ return contactRow(it.kind, it.inner, s, forEmail, it.nowrap, i===items.length-1); }).join("")
+      + '</table>';
 
     // ----- name block -----
     var nameBlock = "";
     if(s.include.title && f.title){
-      nameBlock += '<div style="font-size:14px; color:#2263cf; margin:0 0 2px;">'+esc(f.title)+'</div>';
+      nameBlock += '<div style="font-size:13px; font-weight:600; color:#2263cf; margin:0 0 3px;">'+esc(f.title)+'</div>';
     }
     var nameParts = [];
-    if(s.include.nameZh && f.nameZh) nameParts.push('<span style="color:#2263cf;">'+esc(f.nameZh)+'</span>');
-    if(s.include.nameEn && f.nameEn) nameParts.push('<span style="color:#2263cf;">'+esc(f.nameEn)+'</span>');
+    if(s.include.nameZh && f.nameZh) nameParts.push(esc(f.nameZh));
+    if(s.include.nameEn && f.nameEn) nameParts.push(esc(f.nameEn));
     if(nameParts.length){
-      nameBlock += '<div style="font-size:22px; font-weight:800; margin:0 0 16px;">'+nameParts.join(" ")+'</div>';
+      nameBlock += '<div style="font-size:20px; font-weight:800; color:#2263cf; line-height:1.3; margin:0 0 16px;">'+nameParts.join(" ")+'</div>';
     }
 
     // ----- footer -----
     var footer = "";
     if(s.include.footer){
       footer =
-        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:18px;"><tr>'
-        + '<td style="border-top:1px solid #c5d2e8; padding-top:14px; font-size:13px; font-weight:700; line-height:1.6;">'
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;"><tr>'
+        + '<td style="border-top:1px solid #c5d2e8; padding-top:13px; font-size:12px; font-weight:700; line-height:1.6;">'
         + '<a href="https://www.yourator.co" style="color:#2263cf; text-decoration:none;">Yourator 官網</a>'
         + '<span style="color:#2263cf;">｜</span>'
         + '<a href="https://teamdoor.io" style="color:#2263cf; text-decoration:none;">Teamdoor 官網</a>'
@@ -628,22 +596,22 @@
         + '</td></tr></table>';
     }
 
-    // ----- outer -----
+    // ----- logo (top) -----
+    var logoBlock = '<div style="margin:0 0 16px;">'+img("logo", s, forEmail, 160)+'</div>';
+
+    // ----- outer (single column, compact width) -----
     return ''
       + '<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
-      + 'style="width:100%; max-width:640px; background-color:#eef4fc; background:radial-gradient(120% 150% at 92% 0%, #e6eefa 0%, #eef4fc 50%, #f7faff 82%); border-radius:16px; border-collapse:separate; font-family:\'Noto Sans TC\',\'Microsoft JhengHei\',\'PingFang TC\',\'Segoe UI\',Arial,sans-serif;">'
-      + '<tr><td style="padding:26px 26px 22px;">'
-      + '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
-      + '<td class="yr-logo" valign="middle" style="width:176px; padding-right:14px;">'+img("logo", s, forEmail, 160)+'</td>'
-      + '<td class="yr-main" valign="middle">'+nameBlock+contactTable+'</td>'
-      + '</tr></table>'
-      + footer
+      + 'style="width:100%; max-width:460px; background-color:#eef4fc; background:radial-gradient(120% 150% at 92% 0%, #e6eefa 0%, #eef4fc 50%, #f7faff 82%); border-radius:16px; border-collapse:separate; font-family:\'Noto Sans TC\',\'Microsoft JhengHei\',\'PingFang TC\',\'Segoe UI\',Arial,sans-serif;">'
+      + '<tr><td style="padding:24px 26px 22px;">'
+      + logoBlock + nameBlock + contactTable + footer
       + '</td></tr></table>';
   }
 
   function fullDocument(s){
-    var css = '@media only screen and (max-width:480px){.yr-logo{display:block!important;width:100%!important;text-align:center!important;padding:0 0 18px 0!important;}.yr-main{display:block!important;width:100%!important;text-align:center!important;}.yr-col{display:block!important;width:100%!important;}.yr-col-r{padding-top:11px!important;}}';
-    return '<!DOCTYPE html>\n<html lang="zh-Hant">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Email 簽名檔 — Yourator</title>\n<style>\n'+css+'\n</style>\n</head>\n<body style="margin:0; padding:24px; background:#e6e6e6;">\n'
+    // Single-column layout works at any width, so no media query is needed
+    // (Gmail strips <style> anyway — the copy-signature path is what most people use).
+    return '<!DOCTYPE html>\n<html lang="zh-Hant">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Email 簽名檔 — Yourator</title>\n</head>\n<body style="margin:0; padding:24px; background:#e6e6e6;">\n'
       + buildSignature(s, true)
       + '\n</body>\n</html>\n';
   }
