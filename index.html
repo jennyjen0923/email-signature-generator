@@ -182,7 +182,42 @@
     padding:22px 18px;
     overflow-x:auto;
   }
-  .canvas .sig-scale{min-width:520px;}
+  /* Resizable frame = simulated email width. Drag the right edge. */
+  .sig-frame{
+    width:600px; min-width:280px; max-width:760px;
+    resize:horizontal; overflow:auto;
+    container-type:inline-size;
+    border:1px dashed var(--border-strong); border-radius:12px;
+    background:rgba(255,255,255,.35);
+    padding:6px; box-sizing:content-box;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .sig-frame{background:rgba(255,255,255,.06);} }
+  :root[data-theme="dark"] .sig-frame{background:rgba(255,255,255,.06);}
+  .sig-frame::-webkit-resizer{ background:var(--brand-soft); }
+
+  /* Container-query mirror of the email's max-width:480px stack rule,
+     so dragging the frame narrow shows the real mobile layout. */
+  @container (max-width:480px){
+    .yr-logo{display:block !important; width:100% !important; text-align:center !important; padding:0 0 18px 0 !important;}
+    .yr-main{display:block !important; width:100% !important; text-align:center !important;}
+    .yr-col{display:block !important; width:100% !important;}
+    .yr-col-r{padding-top:11px !important;}
+  }
+
+  .size-bar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin:0 0 10px; font-size:12px; color:var(--muted);
+  }
+  .size-bar .presets{display:flex; gap:6px; flex-wrap:wrap;}
+  .size-bar .presets button{
+    font-family:inherit; font-size:12px; color:var(--ink);
+    background:var(--surface); border:1px solid var(--border); border-radius:7px;
+    padding:4px 9px; cursor:pointer;
+  }
+  .size-bar .presets button:hover{border-color:var(--brand); color:var(--brand);}
+  .size-bar .presets button.on{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .size-bar .readout{margin-left:auto; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .size-bar .readout b{color:var(--brand);}
 
   .actions{display:flex; flex-wrap:wrap; gap:10px;}
   button.act{
@@ -365,7 +400,18 @@
           <span class="t">即時預覽</span>
           <span class="cap">使用你的最佳化圖示</span>
         </div>
-        <div class="canvas"><div class="sig-scale" id="preview"></div></div>
+        <div class="size-bar">
+          <span>模擬信箱寬度</span>
+          <div class="presets">
+            <button type="button" data-w="360">360</button>
+            <button type="button" data-w="480">480</button>
+            <button type="button" data-w="600">600</button>
+            <button type="button" data-w="640">640</button>
+          </div>
+          <span class="readout">寬度 <b id="sizeReadout">600</b> px</span>
+        </div>
+        <div class="canvas"><div class="sig-frame" id="sigFrame"><div id="preview"></div></div></div>
+        <p class="cap" style="margin:8px 0 0; color:var(--muted); font-size:12px;">拖曳虛線框右下角可自由調整寬度，模擬不同信箱／裝置上的實際顯示尺寸；拖到 480px 以下會切換成手機直式版。</p>
       </div>
 
       <div class="actions">
@@ -672,6 +718,36 @@
     applyDefaults(); document.getElementById("embedIcons").checked=DEFAULTS.embed; refresh();
     toast("已重設為範例資料");
   });
+
+  /* ---------- Resizable preview (simulated email width) ---------- */
+  (function(){
+    var frame=document.getElementById("sigFrame");
+    var inner=document.getElementById("preview");
+    var readout=document.getElementById("sizeReadout");
+    var presets=document.querySelectorAll(".size-bar .presets button");
+    if(!frame) return;
+    var SW="yourator-sig-width";
+    function markPreset(w){
+      presets.forEach(function(b){ b.classList.toggle("on", parseInt(b.getAttribute("data-w"),10)===w); });
+    }
+    function report(){
+      var w=Math.round(inner.clientWidth);   // signature's real width = simulated email width
+      readout.textContent=w;
+      markPreset(w);
+      try{ localStorage.setItem(SW, String(w)); }catch(e){}
+    }
+    presets.forEach(function(b){
+      b.addEventListener("click", function(){ frame.style.width=b.getAttribute("data-w")+"px"; report(); });
+    });
+    // restore last width
+    try{ var sw=localStorage.getItem(SW); if(sw){ frame.style.width=sw+"px"; } }catch(e){}
+    if(window.ResizeObserver){
+      new ResizeObserver(report).observe(inner);
+    } else {
+      window.addEventListener("mousemove", report);
+    }
+    report();
+  })();
 
   refresh();
 })();
